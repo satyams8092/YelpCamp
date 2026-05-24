@@ -16,12 +16,25 @@ const seedDb = async () => {
     for (let i = 0; i < 50; i++) {
         const random = Math.floor(Math.random() * 1000)
         const c = new Campground({
-            author:'6a0aa2678452de45d55f8f2d',
+            author: '6a0aa2678452de45d55f8f2d',
             location: `${cities[random].city}, ${cities[random].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
-            image: "https://picsum.photos/200",
             description: 'Good availability and great rates for a place to camp. Read property reviews and choose the best deal for your stay.',
-            price: rand
+            price: rand,
+            images: [
+                {
+                    url: 'https://res.cloudinary.com/dwgga1gmq/image/upload/v1779563935/YelpCamp/ahsdn4vq9suuv6r02gim.jpg',
+                    filename: 'YelpCamp/ahsdn4vq9suuv6r02gim',
+                },
+                {
+                    url: 'https://res.cloudinary.com/dwgga1gmq/image/upload/v1779563965/YelpCamp/t5sdvc2kuyofqomurex5.jpg',
+                    filename: 'YelpCamp/t5sdvc2kuyofqomurex5',
+                },
+                {
+                    url: 'https://res.cloudinary.com/dwgga1gmq/image/upload/v1779563961/YelpCamp/lx9wdtezjtcaexdstikz.jpg',
+                    filename: 'YelpCamp/lx9wdtezjtcaexdstikz',
+                }
+            ]
         })
         await c.save()
     }
