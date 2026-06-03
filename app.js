@@ -1,5 +1,5 @@
 if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config({quite:true});
+    require('dotenv').config({ quiet: true });
 }
 
 const express = require('express')
@@ -21,9 +21,9 @@ const userRoutes = require('./routes/users')
 const passport = require('passport')
 const localStrategy = require('passport-local')
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
-    .then(() => console.log('Connected to MongoDB!'))
-    .catch(err => console.error('Could not connect to MongoDB:', err));
+const mongoDBStore = require("connect-mongo").default
+
+
 
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs')
@@ -33,8 +33,20 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname, 'public')))
 
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
+mongoose.connect(dbUrl)
+    .then(() => console.log('Connected to MongoDB!'))
+    .catch(err => console.error('Could not connect to MongoDB:', err));
+
+const store = mongoDBStore.create({
+    mongoUrl: dbUrl,
+    secret: process.env.SECRET || 'thisisthesecret',
+    touchAfter: 24 * 60 * 60
+})
+
 const sessionConfig = {
-    secret: 'thisisthesectret',
+    store,
+    secret: process.env.SECRET || 'thisisthesecret',
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -55,13 +67,13 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    res.locals.currentUser=req.user
+    res.locals.currentUser = req.user
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
     next()
 })
 
-app.use('/',userRoutes)
+app.use('/', userRoutes)
 app.use('/campgrounds', campgroundRoutes)
 app.use('/campgrounds/:id/reviews', reviewRoutes)
 
